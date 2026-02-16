@@ -1,0 +1,46 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// --- ИГРЫ И ТОВАРЫ ---
+model Game {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  imageUrl    String?
+  items       Item[]
+  createdAt   DateTime   @default(now())
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  title       String
+  price       Float
+  imageUrl    String?
+  gameId      String
+  game        Game     @relation(fields: [gameId], references: [id])
+  sellerId    String
+  status      String   @default("ACTIVE")
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  trends      TrendLog[]
+}
+
+// --- ИИ И АНАЛИТИКА ---
+model TrendLog {
+  id            String   @id @default(cuid())
+  itemId        String
+  item          Item     @relation(fields: [itemId], references: [id])
+  oldPrice      Float
+  newPrice      Float
+  changePercent Float
+  createdAt     DateTime @default(now())
+}
